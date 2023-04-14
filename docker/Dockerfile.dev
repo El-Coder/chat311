@@ -1,7 +1,7 @@
 FROM python:3.10-slim
 
 ## Top level args / env vars
-ARG USERNAME=contribot
+ARG USERNAME=chat311
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -47,16 +47,17 @@ RUN groupadd --gid 1001 $USERNAME \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
-ENV PROJ_ROOT=/opt/contribot
-RUN mkdir -p ${PROJ_ROOT}/contribot && chown $USERNAME -R /opt/
+ENV PROJ_ROOT=/opt/chat311
+RUN mkdir -p ${PROJ_ROOT}/chat311 && chown $USERNAME -R /opt/
 RUN python3 -m pip install poetry
 COPY --chown=${USERNAME} pyproject.toml poetry.lock ${PROJ_ROOT}
 USER ${USERNAME}
 WORKDIR ${PROJ_ROOT}
 ENV SETUPTOOLS_USE_DISTUTILS=stdlib
 RUN poetry config virtualenvs.in-project true
+RUN poetry cache clear --all pypi
 RUN poetry install --no-root --with dev
-COPY ./contribot/* ${PROJ_ROOT}/contribot
+COPY ./chat311/* ${PROJ_ROOT}/chat311
 RUN poetry install --with dev
 
 ## Add default entrypoint

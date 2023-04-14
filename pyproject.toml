@@ -25,7 +25,13 @@ python = ">=3.9,<3.11"
 s3fs = "2023.1.0"
 s3path = "^0.4.1"
 SQLAlchemy = {extras = ["mypy"], version = "^1.4.41"}
-ray = "^2.3.1"
+chromadb = "^0.3.21"
+tiktoken = "^0.3.3"
+orjson = "^3.8.10"
+openai = "^0.27.4"
+httpx = "^0.24.0"
+google-api-python-client = "^2.85.0"
+python-dotenv = "^1.0.0"
 
 [tool.poetry.group.types.dependencies]
 boto3-stubs = {extras = ["s3", "rekognition"], version = "^1.26.109"}
