@@ -26,6 +26,11 @@ def get_prompt():
 
     # Define the command list
     commands = [
+        (
+            "Search MiamiDade.gov website",
+            "search_miamidade",
+            {"input": "<search>"},
+        ),
         ("Google Search", "google", {"input": "<search>"}),
         (
             "Browse Website",
@@ -61,28 +66,28 @@ def get_prompt():
         ),
         ("Delete file", "delete_file", {"file": "<file>"}),
         ("Search Files", "search_files", {"directory": "<directory>"}),
-        ("Evaluate Code", "evaluate_code", {"code": "<full_code_string>"}),
-        (
-            "Get Improved Code",
-            "improve_code",
-            {
-                "suggestions": "<list_of_suggestions>",
-                "code": "<full_code_string>",
-            },
-        ),
-        (
-            "Write Tests",
-            "write_tests",
-            {"code": "<full_code_string>", "focus": "<list_of_focus_areas>"},
-        ),
-        ("Execute Python File", "execute_python_file", {"file": "<file>"}),
-        (
-            "Execute Shell Command, non-interactive commands only",
-            "execute_shell",
-            {"command_line": "<command_line>"},
-        ),
+        # ("Evaluate Code", "evaluate_code", {"code": "<full_code_string>"}),
+        # (
+        #     "Get Improved Code",
+        #     "improve_code",
+        #     {
+        #         "suggestions": "<list_of_suggestions>",
+        #         "code": "<full_code_string>",
+        #     },
+        # ),
+        # (
+        #     "Write Tests",
+        #     "write_tests",
+        #     {"code": "<full_code_string>", "focus": "<list_of_focus_areas>"},
+        # ),
+        # ("Execute Python File", "execute_python_file", {"file": "<file>"}),
+        # (
+        #     "Execute Shell Command, non-interactive commands only",
+        #     "execute_shell",
+        #     {"command_line": "<command_line>"},
+        # ),
         ("Task Complete (Shutdown)", "task_complete", {"reason": "<reason>"}),
-        ("Generate Image", "generate_image", {"prompt": "<prompt>"}),
+        # ("Generate Image", "generate_image", {"prompt": "<prompt>"}),
         ("Do Nothing", "do_nothing", {}),
     ]
 

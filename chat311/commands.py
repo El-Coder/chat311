@@ -64,6 +64,9 @@ def execute_command(command_name, arguments):
     memory = get_memory(cfg)
 
     try:
+        if command_name == "search_miamidade":
+            # https://www.miamidade.gov/global/navigation/global-search.page?q=asdf
+            return miamidade_search(arguments["input"])
         if command_name == "google":
             # Check if the Google API key is set and use the official search method
             # If the API key is not set or has only whitespaces, use the unofficial search method
@@ -146,6 +149,30 @@ def google_search(query, num_results=8):
     return json.dumps(search_results, ensure_ascii=False, indent=4)
 
 
+from requests.models import PreparedRequest
+
+
+def miamidade_search(query):
+    """Return the results of a google search"""
+    req = PreparedRequest()
+    req.prepare_url(
+        "https://www.miamidade.gov/global/navigation/global-search.page",
+        {"q": query},
+    )
+    url = req.url
+    summary = get_text_summary(url, query, sanitize=False)
+    links = get_hyperlinks(url, sanitize=False)
+
+    num_links = 64
+    links = list(filter(lambda l: "miamidade.gov/global" in l, links))[
+        :num_links
+    ]
+
+    result = f"""Website Content Summary: {summary}\n\nLinks: {links}"""
+
+    return result
+
+
 def google_official_search(query, num_results=8):
     """Return the results of a google search using the official Google API"""
     import json
@@ -192,30 +219,28 @@ def google_official_search(query, num_results=8):
     return search_results_links
 
 
-def browse_website(url, question):
+def browse_website(url, question, num_links=5):
     """Browse a website and return the summary and links"""
     summary = get_text_summary(url, question)
     links = get_hyperlinks(url)
 
-    # Limit links to 5
-    if len(links) > 5:
-        links = links[:5]
+    links = links[:num_links]
 
     result = f"""Website Content Summary: {summary}\n\nLinks: {links}"""
 
     return result
 
 
-def get_text_summary(url, question):
+def get_text_summary(url, question, sanitize=True):
     """Return the results of a google search"""
-    text = chat311.browse.scrape_text(url)
+    text = chat311.browse.scrape_text(url, sanitize=sanitize)
     summary = chat311.browse.summarize_text(text, question)
     return """ "Result" : """ + summary
 
 
-def get_hyperlinks(url):
+def get_hyperlinks(url, sanitize=True):
     """Return the results of a google search"""
-    link_list = chat311.browse.scrape_links(url)
+    link_list = chat311.browse.scrape_links(url, sanitize=sanitize)
     return link_list
 
 

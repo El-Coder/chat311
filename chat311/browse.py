@@ -34,7 +34,7 @@ def check_local_file_access(url):
     return any(url.startswith(prefix) for prefix in local_prefixes)
 
 
-def get_response(url, headers=cfg.user_agent_header, timeout=10):
+def get_response(url, headers=cfg.user_agent_header, timeout=10, sanitize=True):
     try:
         # Restrict access to local files
         if check_local_file_access(url):
@@ -44,7 +44,10 @@ def get_response(url, headers=cfg.user_agent_header, timeout=10):
         if not url.startswith("http://") and not url.startswith("https://"):
             raise ValueError("Invalid URL format")
 
-        sanitized_url = sanitize_url(url)
+        if sanitize:
+            sanitized_url = sanitize_url(url)
+        else:
+            sanitized_url = url
 
         response = requests.get(sanitized_url, headers=headers, timeout=timeout)
 
@@ -62,9 +65,9 @@ def get_response(url, headers=cfg.user_agent_header, timeout=10):
         return None, "Error: " + str(re)
 
 
-def scrape_text(url):
+def scrape_text(url, sanitize=True):
     """Scrape text from a webpage"""
-    response, error_message = get_response(url)
+    response, error_message = get_response(url, sanitize=sanitize)
     if error_message:
         return error_message
 
@@ -97,9 +100,9 @@ def format_hyperlinks(hyperlinks):
     return formatted_links
 
 
-def scrape_links(url):
+def scrape_links(url, sanitize=True):
     """Scrape links from a webpage"""
-    response, error_message = get_response(url)
+    response, error_message = get_response(url, sanitize=sanitize)
     if error_message:
         return error_message
 
@@ -110,7 +113,16 @@ def scrape_links(url):
 
     hyperlinks = extract_hyperlinks(soup)
 
-    return format_hyperlinks(hyperlinks)
+    base_url = urlparse(url).netloc
+
+    hyperlinks_with_base = []
+    for link_text, link_url in hyperlinks:
+        if link_url.startswith("/"):
+            hyperlinks_with_base.append((link_text, base_url + link_url))
+        else:
+            hyperlinks_with_base.append((link_text, link_url))
+
+    return format_hyperlinks(hyperlinks_with_base)
 
 
 def split_text(text, max_length=8192):
