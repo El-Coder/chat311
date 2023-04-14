@@ -1,6 +1,6 @@
-from typing import Optional, List, Any
+from typing import Any, List, Optional
 
-from memory.base import MemoryProviderSingleton
+from chat311.memory.base import MemoryProviderSingleton
 
 
 class NoMemory(MemoryProviderSingleton):
@@ -46,7 +46,9 @@ class NoMemory(MemoryProviderSingleton):
         """
         return ""
 
-    def get_relevant(self, data: str, num_relevant: int = 5) -> Optional[List[Any]]:
+    def get_relevant(
+        self, data: str, num_relevant: int = 5
+    ) -> Optional[List[Any]]:
         """
         Returns all the data in the memory that is relevant to the given data.
         NoMemory always returns None.

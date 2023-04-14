@@ -42,7 +42,7 @@ def generate_context(prompt, relevant_memory, full_message_history, model):
     next_message_to_add_index = len(full_message_history) - 1
     insertion_index = len(current_context)
     # Count the currently used tokens
-    current_tokens_used = token_counter.count_message_tokens(
+    current_tokens_used = chat311.token_counter.count_message_tokens(
         current_context, model
     )
     return (
@@ -112,7 +112,7 @@ def chat_with_ai(
                     prompt, relevant_memory, full_message_history, model
                 )
 
-            current_tokens_used += token_counter.count_message_tokens(
+            current_tokens_used += chat311.token_counter.count_message_tokens(
                 [create_chat_message("user", user_input)], model
             )  # Account for user input (appended later)
 
@@ -120,7 +120,7 @@ def chat_with_ai(
                 # print (f"CURRENT TOKENS USED: {current_tokens_used}")
                 message_to_add = full_message_history[next_message_to_add_index]
 
-                tokens_to_add = token_counter.count_message_tokens(
+                tokens_to_add = chat311.token_counter.count_message_tokens(
                     [message_to_add], model
                 )
                 if current_tokens_used + tokens_to_add > send_token_limit:

@@ -24,7 +24,7 @@ class ChromaMemory(MemoryProviderSingleton):
         dimension = 1536
         metric = "cosine"
         pod_type = "p1"
-        index_name = "chat311"
+        self.index_name = "chat311"
 
         self.collection = self.client.get_or_create_collection(
             name=self.index_name, embedding_function=get_ada_embedding

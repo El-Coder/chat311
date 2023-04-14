@@ -169,7 +169,7 @@ def construct_prompt():
             f"Would you like me to return to being {config.ai_name}?",
             speak_text=True,
         )
-        should_continue = utils.clean_input(
+        should_continue = chat311.utils.clean_input(
             f"""Continue with the last settings?
 Name:  {config.ai_name}
 Role:  {config.ai_role}
@@ -206,7 +206,7 @@ def prompt_user():
     logger.typewriter_log(
         "Name your AI: ", Fore.GREEN, "For example, 'Entrepreneur-GPT'"
     )
-    ai_name = utils.clean_input("AI Name: ")
+    ai_name = chat311.utils.clean_input("AI Name: ")
     if ai_name == "":
         ai_name = "Entrepreneur-GPT"
 
@@ -223,7 +223,7 @@ def prompt_user():
         Fore.GREEN,
         "For example, 'an AI designed to autonomously develop and run businesses with the sole goal of increasing your net worth.'",
     )
-    ai_role = utils.clean_input(f"{ai_name} is: ")
+    ai_role = chat311.utils.clean_input(f"{ai_name} is: ")
     if ai_role == "":
         ai_role = "an AI designed to autonomously develop and run businesses with the sole goal of increasing your net worth."
 
@@ -239,7 +239,7 @@ def prompt_user():
     )
     ai_goals = []
     for i in range(5):
-        ai_goal = utils.clean_input(
+        ai_goal = chat311.utils.clean_input(
             f"{Fore.LIGHTBLUE_EX}Goal{Style.RESET_ALL} {i+1}: "
         )
         if ai_goal == "":
@@ -424,7 +424,7 @@ class Agent:
 
             # Send message to AI, get response
             with Spinner("Thinking... "):
-                assistant_reply = chat.chat_with_ai(
+                assistant_reply = chat311.chat.chat_with_ai(
                     self.prompt,
                     self.user_input,
                     self.full_message_history,
