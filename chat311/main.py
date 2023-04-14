@@ -442,8 +442,6 @@ class Agent:
                         assistant_reply
                     )
                 )
-                if cfg.speak_mode:
-                    speak.say_text(f"I want to execute {command_name}")
             except Exception as e:
                 logger.error("Error: \n", str(e))
 
@@ -462,7 +460,7 @@ class Agent:
                     flush=True,
                 )
                 while True:
-                    console_input = utils.clean_input(
+                    console_input = chat311.utils.clean_input(
                         Fore.MAGENTA + "Input:" + Style.RESET_ALL
                     )
                     if console_input.lower().rstrip() == "y":
@@ -532,12 +530,12 @@ class Agent:
             # history
             if result is not None:
                 self.full_message_history.append(
-                    chat.create_chat_message("system", result)
+                    chat311.chat.create_chat_message("system", result)
                 )
                 logger.typewriter_log("SYSTEM: ", Fore.YELLOW, result)
             else:
                 self.full_message_history.append(
-                    chat.create_chat_message(
+                    chat311.chat.create_chat_message(
                         "system", "Unable to execute command"
                     )
                 )
