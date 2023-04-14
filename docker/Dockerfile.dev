@@ -1,0 +1,75 @@
+FROM python:3.10-slim
+
+## Top level args / env vars
+ARG USERNAME=contribot
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+ENV DEBIAN_FRONTEND=noninteractive
+
+## Install gh
+RUN apt-get update -y \
+    && apt-get -y install \
+    curl \
+    && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+    && apt update \
+    && apt install gh -y
+
+## Apt based dependencies
+RUN apt-get update -y \
+    && apt-get -y install \
+    curl \
+    awscli \
+    g++ \
+    gcc \
+    gh \
+    git \
+    jq \
+    libpq-dev \
+    postgresql-client \
+    s3fs \
+    vim \
+    wget \
+    zsh \
+    && rm -rf /var/lib/apt/lists/*
+
+## Add fuse access to unprivledged user
+RUN sed -i '/user_allow_other/s/^#//g' /etc/fuse.conf
+
+## Create unpriv user
+RUN groupadd --gid 1001 $USERNAME \
+    && useradd --uid $USER_UID --gid 1001 -m $USERNAME \
+    && apt-get update \
+    && apt-get install -y sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
+ENV PROJ_ROOT=/opt/contribot
+RUN mkdir -p ${PROJ_ROOT}/contribot && chown $USERNAME -R /opt/
+RUN python3 -m pip install poetry
+COPY --chown=${USERNAME} pyproject.toml poetry.lock ${PROJ_ROOT}
+USER ${USERNAME}
+WORKDIR ${PROJ_ROOT}
+ENV SETUPTOOLS_USE_DISTUTILS=stdlib
+RUN poetry config virtualenvs.in-project true
+RUN poetry install --no-root --with dev
+COPY ./contribot/* ${PROJ_ROOT}/contribot
+RUN poetry install --with dev
+
+## Add default entrypoint
+ENV SHELL /bin/bash
+COPY ./docker/entrypoint.sh /
+RUN sudo chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+
+## Make unpriv user use poetry env in default shell
+USER root
+RUN echo "source /entrypoint.sh" >> /etc/profile
+USER $USERNAME
+
+## Add alembic init script
+COPY ./docker/alembic_init.sh /
+RUN sudo chmod +x /alembic_init.sh

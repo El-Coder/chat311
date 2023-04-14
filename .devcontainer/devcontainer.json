@@ -1,0 +1,59 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.245.0/containers/docker-existing-docker-compose
+// If you want to run as a non-root user in the container, see .devcontainer/docker-compose.yml.
+{
+  "name": "local dev",
+  "hostRequirements": {
+    "cpus": 8,
+    "memory": "8gb"
+  },
+  "dockerComposeFile": ["../docker-compose-dev.yml"],
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "[python]": {
+          "editor.tabSize": 4,
+          "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+          }
+        },
+        "editor.formatOnSave": true,
+        "git.ignoreMissingGitWarning": true,
+        "python.defaultInterpreterPath": "/opt/chat311/.venv/bin/python",
+        "python.formatting.blackPath": "/opt/chat311/.venv/bin/black",
+        "python.formatting.provider": "black",
+        "python.isort.args": ["--profile", "black"],
+        "python.languageServer": "Default",
+        "python.linting.enabled": true,
+        "python.linting.flake8Enabled": true,
+        "python.linting.flake8Path": "/opt/chat311/.venv/bin/flake8",
+        "python.linting.lintOnSave": true,
+        "python.linting.mypyEnabled": true,
+        "python.linting.mypyPath": "/opt/chat311/.venv/bin/mypy",
+        "python.linting.pylintArgs": ["--verbose"],
+        "python.linting.pylintEnabled": true,
+        "python.linting.pylintPath": "/opt/chat311/.venv/bin/pylint",
+        "terminal.integrated.profiles.linux": {
+          "bash (container default)": {
+            "path": "/bin/bash",
+            "overrideName": true
+          }
+        },
+        "workbench.iconTheme": "vscode-icons"
+      },
+      "extensions": [
+        "ms-python.isort",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "timonwong.shellcheck",
+        "vscode-icons-team.vscode-icons",
+        "wayou.vscode-todo-highlight",
+        "github.copilot"
+      ]
+    }
+  },
+  "service": "dev",
+  "userEnvProbe": "loginInteractiveShell",
+  "workspaceFolder": "/workspace",
+  "initializeCommand": "sh .devcontainer/initialize.sh"
+}

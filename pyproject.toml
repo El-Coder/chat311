@@ -1,0 +1,144 @@
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]
+
+[tool.poetry]
+authors = [
+  "Alex Comerford <alex@taoa.io>",
+]
+description = " "
+license = "PRIVATE"
+name = "chat311"
+version = "0.0.0"
+packages = [
+    { include = "chat311" },
+]
+
+[tool.poetry.dependencies]
+boto3="^1.24.59"
+botocore="1.27.59"
+nest-asyncio = "^1.5.6"
+numpy = "^1.23.4"
+psycopg2 = "^2.9.4"
+pydantic = "^1.10.2"
+python = ">=3.9,<3.11"
+s3fs = "2023.1.0"
+s3path = "^0.4.1"
+SQLAlchemy = {extras = ["mypy"], version = "^1.4.41"}
+ray = "^2.3.1"
+
+[tool.poetry.group.types.dependencies]
+boto3-stubs = {extras = ["s3", "rekognition"], version = "^1.26.109"}
+mypy-boto3-rekognition = "^1.26.28"
+mypy-boto3-s3 = "^1.26.58"
+sqlalchemy-stubs = "^0.4"
+types-boto3 = "^1.0.2"
+
+[tool.poetry.group.test.dependencies]
+moto = "^4.0.9"
+pytest = "^7.2.2"
+pytest-asyncio = "^0.20.3"
+pytest-cov = "^4.0.0"
+pytest-env = "^0.8.1"
+pytest-mock = "^3.10.0"
+pytest-random-order = "^1.1.0"
+pytest-socket = "^0.6.0"
+
+[tool.poetry.group.dev.dependencies]
+asteroid = "^0.6.0"
+black = {extras = ["jupyter"], version = "^23.1.0"}
+flake8 = "^5.0.4"
+ipykernel = "^6.16.2"
+isort = "^5.10.1"
+jupyter = "^1.0.0"
+mypy = "^1.2.0"
+notebook = "^6.5.1"
+pydocstyle = "^6.3.0"
+pylint = "^2.15.5"
+pyright = "^1.1.301"
+pyupgrade = "^3.3.1"
+ruff = "^0.0.261"
+
+[tool.poetry.group.inference.dependencies]
+fastapi = "^0.95.0"
+starlette = "^0.26.1"
+uvicorn = "^0.20.0"
+
+[[tool.mypy.overrides]]
+module = [
+  'astroid.*',
+  'clip.*',
+  'cv2.*',
+  'dagster.*',
+  'dagster_celery.*',
+  'dask.*',
+  'dill.*',
+  'distributed.*',
+  'dotenv.*',
+  'fastapi.*',
+  'fsspec.*',
+  'h5py.*',
+  'joblib.*',
+  'keras-retinanet.*',
+  'mediapipe.*',
+  'moto.*',
+  'open_clip.*',
+  'pandas.*',
+  'pydantic.*',
+  'pylint.*',
+  'pyonepassword.*',
+  's3fs.*',
+  's3path.*',
+  'scipy.*',
+  'semver.*',
+  'skimage.*',
+  'sklearn.*',
+  'tensorflow.*',
+  'torch.*',
+  'torchvision.*',
+  'xgboost.*'
+]
+ignore_missing_imports = true
+exclude = [
+  "test/**/*_test.py",
+  "test/**/test_*.py"
+]
+
+[tool.pytest.ini_options]
+addopts = "--cov=cvml --cov-report=term-missing --random-order"
+asyncio_mode = "auto"
+env = [
+  "ENV=dev"
+]
+minversion = "6.0"
+markers = [
+  "integration: mark test as integration test",
+  "determinism: mark test as determinism test",
+]
+
+[tool.coverage.run]
+omit = [
+  "**/_remote_module_non_scriptable.py",
+  "test/**/*.py",
+]
+
+[tool.black]
+line-length = 80
+target-version = ['py39']
+extend-exclude = "^/migrations$"
+
+[tool.ruff]
+line-length = 80
+target-version = "py310"
+
+[tool.isort]
+profile = "black"
+line_length = 80
+py_version = '39'
+
+[tool.mypy]
+plugins = [
+  "numpy.typing.mypy_plugin",
+  "sqlmypy"
+]
+check_untyped_defs = false

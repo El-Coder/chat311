@@ -1,0 +1,70 @@
+version: '3'
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.dev
+    volumes:
+      - .:/workspace:Z
+    command:
+      - sleep
+      - infinity
+    platform: linux/amd64
+    env_file: .env
+    environment:
+      - ENV=local
+      - AWS_ACCESS_KEY_ID=minioadmin
+      - AWS_SECRET_ACCESS_KEY_ID=minioadmin
+      - AWS_S3_ENDPOINT=http://minio:9000
+      - CHAT311_DRIVER=postgresql+psycopg2
+      - CHAT311_HOST=pgbouncer
+      - CHAT311_NAME=chat311
+      - CHAT311_PASS=chat311
+      - CHAT311_PORT=5432
+      - CHAT311_USER=chat311
+
+  db:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.postgres
+    volumes:
+      - db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=chat311
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_PASSWORD=chat311
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=chat311
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgbouncer:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.pgbouncer
+    restart: always
+    environment:
+      - IGNORE_STARTUP_PARAMETERS=options
+      - MAX_CLIENT_CONN=10000
+      - MAX_DB_CONNECTIONS=20
+      - MAX_USER_CONNECTIONS=20
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - DB_USER1=chat311
+      - DB_PASSWORD1=chat311
+      - DB_HOST1=db
+      - DB_NAME1=chat311
+
+  minio:
+    image: minio/minio
+    volumes:
+      - minio:/data
+    ports:
+      - "3001:9001"
+    command: server /data --console-address ":9001"
+
+volumes:
+  db:
+  minio:
