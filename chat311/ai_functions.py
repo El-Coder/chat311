@@ -1,7 +1,9 @@
-from typing import List
 import json
-from config import Config
-from call_ai_function import call_ai_function
+from typing import List
+
+from chat311.call_ai_function import call_ai_function
+from chat311.config import Config
+
 cfg = Config()
 
 

@@ -1,4 +1,4 @@
-from llm_utils import create_chat_completion
+from chat311.llm_utils import create_chat_completion
 
 next_key = 0
 agents = {}  # key, (task, full_message_history, model)
@@ -12,7 +12,9 @@ def create_agent(task, prompt, model):
     global next_key
     global agents
 
-    messages = [{"role": "user", "content": prompt}, ]
+    messages = [
+        {"role": "user", "content": prompt},
+    ]
 
     # Start GPT instance
     agent_reply = create_chat_completion(

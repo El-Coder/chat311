@@ -1,8 +1,10 @@
+from urllib.parse import urljoin, urlparse
+
 import requests
 from bs4 import BeautifulSoup
-from config import Config
-from llm_utils import create_chat_completion
-from urllib.parse import urlparse, urljoin
+
+from chat311.config import Config
+from chat311.llm_utils import create_chat_completion
 
 cfg = Config()
 
@@ -23,7 +25,12 @@ def sanitize_url(url):
 
 # Define and check for local file address prefixes
 def check_local_file_access(url):
-    local_prefixes = ['file:///', 'file://localhost', 'http://localhost', 'https://localhost']
+    local_prefixes = [
+        "file:///",
+        "file://localhost",
+        "http://localhost",
+        "https://localhost",
+    ]
     return any(url.startswith(prefix) for prefix in local_prefixes)
 
 
@@ -31,11 +38,11 @@ def get_response(url, headers=cfg.user_agent_header, timeout=10):
     try:
         # Restrict access to local files
         if check_local_file_access(url):
-            raise ValueError('Access to local files is restricted')
+            raise ValueError("Access to local files is restricted")
 
         # Most basic check if the URL is valid:
-        if not url.startswith('http://') and not url.startswith('https://'):
-            raise ValueError('Invalid URL format')
+        if not url.startswith("http://") and not url.startswith("https://"):
+            raise ValueError("Invalid URL format")
 
         sanitized_url = sanitize_url(url)
 
@@ -69,7 +76,7 @@ def scrape_text(url):
     text = soup.get_text()
     lines = (line.strip() for line in text.splitlines())
     chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-    text = '\n'.join(chunk for chunk in chunks if chunk)
+    text = "\n".join(chunk for chunk in chunks if chunk)
 
     return text
 
@@ -77,8 +84,8 @@ def scrape_text(url):
 def extract_hyperlinks(soup):
     """Extract hyperlinks from a BeautifulSoup object"""
     hyperlinks = []
-    for link in soup.find_all('a', href=True):
-        hyperlinks.append((link.text, link['href']))
+    for link in soup.find_all("a", href=True):
+        hyperlinks.append((link.text, link["href"]))
     return hyperlinks
 
 
@@ -129,7 +136,7 @@ def create_message(chunk, question):
     """Create a message for the user to summarize a chunk of text"""
     return {
         "role": "user",
-        "content": f"\"\"\"{chunk}\"\"\" Using the above text, please answer the following question: \"{question}\" -- if the question cannot be answered using the text, please summarize the text."
+        "content": f'"""{chunk}""" Using the above text, please answer the following question: "{question}" -- if the question cannot be answered using the text, please summarize the text.',
     }
 
 

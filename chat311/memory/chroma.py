@@ -27,39 +27,39 @@ class ChromaMemory(MemoryProviderSingleton):
         index_name = "chat311"
 
         self.collection = self.client.get_or_create_collection(
-            name=self.index_name
+            name=self.index_name, embedding_function=get_ada_embedding
         )
 
     def add(self, data):
-        vector = get_ada_embedding(data)
+        # vector = get_ada_embedding(data)
         # no metadata here. We may wish to change that long term.
-        self.collection.add(embeddings=[vector], documents=[])
-        resp = self.index.upsert(
-            [(str(self.vec_num), vector, {"raw_text": data})]
-        )
-        _text = f"Inserting data into memory at index: {self.vec_num}:\n data: {data}"
-        self.vec_num += 1
+        self.collection.add(documents=[data], ids=[self.collection.count()])
+        _text = f"Inserting data into memory at index: {self.collection.count()}:\n data: {data}"
         return _text
 
     def get(self, data):
         return self.get_relevant(data, 1)
 
     def clear(self):
-        self.index.delete(deleteAll=True)
+        self.client.delete_collection(name=self.index_name)
         return "Obliviated"
 
     def get_relevant(self, data, num_relevant=5):
-        """
-        Returns all the data in the memory that is relevant to the given data.
-        :param data: The data to compare to.
-        :param num_relevant: The number of relevant data to return. Defaults to 5
-        """
         query_embedding = get_ada_embedding(data)
-        results = self.index.query(
-            query_embedding, top_k=num_relevant, include_metadata=True
+        results = self.collection.query(
+            query_embeddings=[query_embedding],
+            n_results=num_relevant,
+            include=["embeddings", "documents", "metadatas"],
         )
-        sorted_results = sorted(results.matches, key=lambda x: x.score)
-        return [str(item["metadata"]["raw_text"]) for item in sorted_results]
+
+        # Sort by distance increasing
+        sorted_results = results  # sorted(results.distances, key=lambda x: x)
+        res = []
+        for row in sorted_results.get("documents"):
+            for item in row:
+                res.append(str(item))
+        return res
+        # return [str(item["metadata"]["raw_text"]) for item in sorted_results]
 
     def get_stats(self):
-        return self.index.describe_index_stats()
+        return self.collection.count()

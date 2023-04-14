@@ -1,8 +1,8 @@
-from config import Config
+from chat311.config import Config
 
 cfg = Config()
 
-from llm_utils import create_chat_completion
+from chat311.llm_utils import create_chat_completion
 
 
 # This is a magic function that can do anything with no-code. See
