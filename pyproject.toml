@@ -33,6 +33,7 @@ httpx = "^0.24.0"
 google-api-python-client = "^2.85.0"
 python-dotenv = "^1.0.0"
 colorama = "^0.4.6"
+duckduckgo-search = "^2.8.5"
 
 [tool.poetry.group.types.dependencies]
 boto3-stubs = {extras = ["s3", "rekognition"], version = "^1.26.109"}

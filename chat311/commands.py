@@ -1,6 +1,7 @@
 import datetime
 import json
 
+from duckduckgo_search import ddg
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
@@ -8,8 +9,6 @@ import chat311.agent_manager as agents
 import chat311.ai_functions as ai
 import chat311.browse
 from chat311.config import Config
-
-# from duckduckgo_search import ddg
 from chat311.execute_code import execute_python_file, execute_shell
 from chat311.file_operations import (
     append_to_file,
@@ -68,12 +67,12 @@ def execute_command(command_name, arguments):
         if command_name == "google":
             # Check if the Google API key is set and use the official search method
             # If the API key is not set or has only whitespaces, use the unofficial search method
-            if cfg.google_api_key and (
-                cfg.google_api_key.strip() if cfg.google_api_key else None
-            ):
-                return google_official_search(arguments["input"])
-            else:
-                return google_search(arguments["input"])
+            # if cfg.google_api_key and (
+            #     cfg.google_api_key.strip() if cfg.google_api_key else None
+            # ):
+            #     return google_official_search(arguments["input"])
+            # else:
+            return google_search(arguments["input"])
         elif command_name == "memory_add":
             return memory.add(arguments["string"])
         elif command_name == "start_agent":
@@ -209,14 +208,14 @@ def browse_website(url, question):
 
 def get_text_summary(url, question):
     """Return the results of a google search"""
-    text = browse.scrape_text(url)
-    summary = browse.summarize_text(text, question)
+    text = chat311.browse.scrape_text(url)
+    summary = chat311.browse.summarize_text(text, question)
     return """ "Result" : """ + summary
 
 
 def get_hyperlinks(url):
     """Return the results of a google search"""
-    link_list = browse.scrape_links(url)
+    link_list = chat311.browse.scrape_links(url)
     return link_list
 
 
@@ -282,18 +281,18 @@ def start_agent(name, task, prompt, model=cfg.fast_llm_model):
     global cfg
 
     # Remove underscores from name
-    voice_name = name.replace("_", " ")
+    voice_name = name
 
     first_message = f"""You are {name}.  Respond with: "Acknowledged"."""
     agent_intro = f"{voice_name} here, Reporting for duty!"
 
     # Create agent
-    if cfg.speak_mode:
-        speak.say_text(agent_intro, 1)
+    # if cfg.speak_mode:
+    #     speak.say_text(agent_intro, 1)
     key, ack = agents.create_agent(task, first_message, model)
 
-    if cfg.speak_mode:
-        speak.say_text(f"Hello {voice_name}. Your task is as follows. {task}.")
+    # if cfg.speak_mode:
+    #     speak.say_text(f"Hello {voice_name}. Your task is as follows. {task}.")
 
     # Assign task (prompt), get response
     agent_response = message_agent(key, prompt)

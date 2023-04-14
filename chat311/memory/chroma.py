@@ -26,14 +26,18 @@ class ChromaMemory(MemoryProviderSingleton):
         pod_type = "p1"
         self.index_name = "chat311"
 
+        self.embedding_function = lambda x: list(map(get_ada_embedding, x))
+
         self.collection = self.client.get_or_create_collection(
-            name=self.index_name, embedding_function=get_ada_embedding
+            name=self.index_name, embedding_function=self.embedding_function
         )
 
     def add(self, data):
         # vector = get_ada_embedding(data)
         # no metadata here. We may wish to change that long term.
-        self.collection.add(documents=[data], ids=[self.collection.count()])
+        self.collection.add(
+            documents=[data], ids=[str(self.collection.count())]
+        )
         _text = f"Inserting data into memory at index: {self.collection.count()}:\n data: {data}"
         return _text
 
@@ -46,6 +50,8 @@ class ChromaMemory(MemoryProviderSingleton):
 
     def get_relevant(self, data, num_relevant=5):
         query_embedding = get_ada_embedding(data)
+        if num_relevant > self.collection.count():
+            num_relevant = self.collection.count()
         results = self.collection.query(
             query_embeddings=[query_embedding],
             n_results=num_relevant,
