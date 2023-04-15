@@ -73,9 +73,8 @@ def attempt_to_fix_json_by_finding_outermost_brackets(json_string):
     return json_string
 
 
-def print_assistant_thoughts(assistant_reply):
+def print_assistant_thoughts(assistant_reply, ai_name=""):
     """Prints the assistant's thoughts to the console"""
-    global ai_name
     global cfg
     try:
         try:
@@ -433,7 +432,7 @@ class Agent:
                 )  # TODO: This hardcodes the model to use GPT3.5. Make this an argument
 
             # Print Assistant thoughts
-            print_assistant_thoughts(assistant_reply)
+            print_assistant_thoughts(assistant_reply, ai_name=self.ai_name)
 
             # Get command name and arguments
             try:
@@ -513,6 +512,8 @@ class Agent:
                 )
             elif command_name == "human_feedback":
                 result = f"Human feedback: {self.user_input}"
+            elif command_name == "print_answer":
+                logger.typewriter_log("SYSTEM: ", Fore.YELLOW, arguments)
             else:
                 result = f"Command {command_name} returned: {cmd.execute_command(command_name, arguments)}"
                 if self.next_action_count > 0:

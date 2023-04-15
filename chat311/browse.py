@@ -125,6 +125,31 @@ def scrape_links(url, sanitize=True):
     return format_hyperlinks(hyperlinks_with_base)
 
 
+def scrape_links_dict(url, sanitize=True):
+    """Scrape links from a webpage"""
+    response, error_message = get_response(url, sanitize=sanitize)
+    if error_message:
+        return error_message
+
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    for script in soup(["script", "style"]):
+        script.extract()
+
+    hyperlinks = extract_hyperlinks(soup)
+
+    base_url = urlparse(url).netloc
+
+    hyperlinks_with_base = []
+    for link_text, link_url in hyperlinks:
+        if link_url.startswith("/"):
+            hyperlinks_with_base.append((link_text, base_url + link_url))
+        else:
+            hyperlinks_with_base.append((link_text, link_url))
+
+    return hyperlinks_with_base
+
+
 def split_text(text, max_length=8192):
     """Split text into chunks of a maximum length"""
     paragraphs = text.split("\n")

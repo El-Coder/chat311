@@ -67,7 +67,7 @@ def execute_command(command_name, arguments):
         if command_name == "search_miamidade":
             # https://www.miamidade.gov/global/navigation/global-search.page?q=asdf
             return miamidade_search(arguments["input"])
-        if command_name == "google":
+        elif command_name == "google":
             # Check if the Google API key is set and use the official search method
             # If the API key is not set or has only whitespaces, use the unofficial search method
             # if cfg.google_api_key and (
@@ -154,23 +154,41 @@ from requests.models import PreparedRequest
 
 def miamidade_search(query):
     """Return the results of a google search"""
-    req = PreparedRequest()
-    req.prepare_url(
-        "https://www.miamidade.gov/global/navigation/global-search.page",
-        {"q": query},
-    )
-    url = req.url
-    summary = get_text_summary(url, query, sanitize=False)
-    links = get_hyperlinks(url, sanitize=False)
+    return google_search(f"miamidade.gov {query}")
+    # req = PreparedRequest()
+    # incl = "".join([f"text:*{i}*^0.4" for i in query.split(" ")])
+    # req.prepare_url(
+    #     "https://www.miamidade.gov/global/navigation/global-search/1641661065762.ajax",
+    #     {
+    #         "action": "query",
+    #         "page": 1,
+    #         "db": "miamidade",
+    #         "system": "solr",
+    #         "filter": ["-internalOnly:true", "-dateExpiration:[* TO NOW-1DAY]"],
+    #         "expand": "organization",
+    #         "text": f'+({incl} name:"{query}"^4 keywords:"{query}"^3 description:"{query}" url:"{query}" text:"{query}" name:{query} keywords:{query} description:{query} url:{query} text:{query}^0.4 name:{query.replace(" ", "+")} keywords:{query.replace(" ", "+")} description:{query.replace(" ", "+")} url:{query.replace(" ", "+")} text:{query.replace(" ", "+")}) dcrType:"data-types/service"^6 url:"home.page"^3',
+    #     },
+    # )
 
-    num_links = 64
-    links = list(filter(lambda l: "miamidade.gov/global" in l, links))[
-        :num_links
-    ]
+    # r = requests.get(req.url).json()
+    # links = []
+    # for i in r["results"]:
+    #     pass
 
-    result = f"""Website Content Summary: {summary}\n\nLinks: {links}"""
-
-    return result
+    # num_links = 2**4
+    # links = list(filter(lambda item: "miamidade.gov/global" in item[1], links))[
+    #     :num_links
+    # ]
+    # print(links)
+    # return json.dumps(
+    #     [
+    #         {
+    #             "text": link_text,
+    #             "href": link_url,
+    #         }
+    #         for link_text, link_url in links
+    #     ]
+    # )
 
 
 def google_official_search(query, num_results=8):

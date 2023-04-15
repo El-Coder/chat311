@@ -1,6 +1,8 @@
 """
 Chromadb memory provider.
 """
+from uuid import uuid4
+
 import chromadb
 from chromadb.config import Settings
 
@@ -24,12 +26,14 @@ class ChromaMemory(MemoryProviderSingleton):
         dimension = 1536
         metric = "cosine"
         pod_type = "p1"
-        self.index_name = "chat311"
+        self.index_name = str(uuid4())  # "chat311"
 
         self.embedding_function = lambda x: list(map(get_ada_embedding, x))
 
+        # self.clear()
         self.collection = self.client.get_or_create_collection(
-            name=self.index_name, embedding_function=self.embedding_function
+            name=self.index_name,
+            embedding_function=self.embedding_function,
         )
 
     def add(self, data):
@@ -59,7 +63,9 @@ class ChromaMemory(MemoryProviderSingleton):
         )
 
         # Sort by distance increasing
-        sorted_results = results  # sorted(results.distances, key=lambda x: x)
+        sorted_results = (
+            results  # sorted(results.distances, key=lambda x: x)
+        )
         res = []
         for row in sorted_results.get("documents"):
             for item in row:
@@ -68,4 +74,4 @@ class ChromaMemory(MemoryProviderSingleton):
         # return [str(item["metadata"]["raw_text"]) for item in sorted_results]
 
     def get_stats(self):
-        return self.collection.count()
+        return None

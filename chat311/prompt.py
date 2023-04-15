@@ -35,7 +35,10 @@ def get_prompt():
         (
             "Browse Website",
             "browse_website",
-            {"url": "<url>", "question": "<what_you_want_to_find_on_website>"},
+            {
+                "url": "<url>",
+                "question": "<what_you_want_to_find_on_website>",
+            },
         ),
         (
             "Start GPT Agent",
@@ -53,19 +56,20 @@ def get_prompt():
         ),
         ("List GPT Agents", "list_agents", {}),
         ("Delete GPT Agent", "delete_agent", {"key": "<key>"}),
-        (
-            "Write to file",
-            "write_to_file",
-            {"file": "<file>", "text": "<text>"},
-        ),
-        ("Read file", "read_file", {"file": "<file>"}),
-        (
-            "Append to file",
-            "append_to_file",
-            {"file": "<file>", "text": "<text>"},
-        ),
-        ("Delete file", "delete_file", {"file": "<file>"}),
-        ("Search Files", "search_files", {"directory": "<directory>"}),
+        # (
+        #     "Write to file",
+        #     "write_to_file",
+        #     {"file": "<file>", "text": "<text>"},
+        # ),
+        # ("Read file", "read_file", {"file": "<file>"}),
+        # (
+        #     "Append to file",
+        #     "append_to_file",
+        #     {"file": "<file>", "text": "<text>"},
+        # ),
+        # ("Delete file", "delete_file", {"file": "<file>"}),
+        # ("Search Files", "search_files", {"directory": "<directory>"}),
+        ("print_answer", "print_answer", {"answer": "<answer>"}),
         # ("Evaluate Code", "evaluate_code", {"code": "<full_code_string>"}),
         # (
         #     "Get Improved Code",
@@ -86,7 +90,7 @@ def get_prompt():
         #     "execute_shell",
         #     {"command_line": "<command_line>"},
         # ),
-        ("Task Complete (Shutdown)", "task_complete", {"reason": "<reason>"}),
+        # ("Task Complete (Shutdown)", "task_complete", {"reason": "<reason>"}),
         # ("Generate Image", "generate_image", {"prompt": "<prompt>"}),
         ("Do Nothing", "do_nothing", {}),
     ]
@@ -99,11 +103,12 @@ def get_prompt():
     prompt_generator.add_resource(
         "Internet access for searches and information gathering."
     )
+    prompt_generator.add_resource("Website summarization.")
     prompt_generator.add_resource("Long Term memory management.")
     prompt_generator.add_resource(
         "GPT-3.5 powered Agents for delegation of simple tasks."
     )
-    prompt_generator.add_resource("File output.")
+    # prompt_generator.add_resource("File output.")
 
     # Add performance evaluations to the PromptGenerator object
     prompt_generator.add_performance_evaluation(
@@ -117,6 +122,12 @@ def get_prompt():
     )
     prompt_generator.add_performance_evaluation(
         "Every command has a cost, so be smart and efficient. Aim to complete tasks in the least number of steps."
+    )
+    prompt_generator.add_performance_evaluation(
+        "If the goal is not specific enough, make assumptions and try to interpret the question."
+    )
+    prompt_generator.add_performance_evaluation(
+        "Do not ask the user to provide context of information."
     )
 
     # Generate the prompt string
